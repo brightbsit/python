@@ -1,0 +1,9 @@
+import pandas as pd
+data = pd.read_csv('파일', delimiter='\t')
+print(data)
+
+<Ex>
+import pandas as pd
+dataset = pd.read_csv("D:/Oscar/oscar/coco_caption/test.feature.tsv", delimiter='\t')
+print(dataset)
+
