@@ -1,0 +1,58 @@
+    # Prepare an image
+    images = [] 
+    images_tensor = []
+    features = []
+    sentences = []
+    sampled_ids = []
+    caption = []
+    try:
+        file = open('png/images.txt', 'rt')
+        print("파일 열기 성공")
+    except:
+        print("파일 열기 실패")
+
+    for image in file:
+        images.append(image.rstrip('\n'))
+
+    for img in range(len(images)):
+        image = load_image('png/' + (images[img]), transform)
+        images_tensor.append(image.to(device))
+        
+
+    #Generate an caption from the image
+    for f in range(len(images)):
+        features.append(encoder(images_tensor[f]))
+
+    for f in range(len(images)):
+        tmp = decoder.sample(features[f])
+        sampled_ids.append(tmp[0].cpu().numpy())
+    
+
+    #토큰화 된 단어들 이어 붙이기
+    sampled_caption = []
+    for word_ids in sampled_ids:
+        for word_id in word_ids:
+            word = vocab.idx2word[word_id]
+            sampled_caption.append(word)
+            if word == '<end>':
+                break
+    sentence = ' '.join(sampled_caption)
+
+    #start와 end라는 단어가 감정 분류에 영향을 줄 수 있으므로 start와 end제거
+    s = []
+    index = []
+    num = 0
+    while True:
+        num = sentence.find('<end>', num+1)
+        if(num == -1):
+            break
+        else:
+            index.append(num)
+    
+    caption = []
+    start = 7
+    for i in index:
+        caption.append(sentence[start:i])
+        start = i+14
+    
+    print(caption)
